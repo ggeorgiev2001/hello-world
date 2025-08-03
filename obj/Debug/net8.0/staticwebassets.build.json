@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "185EKeuKR8NY513LVsXM40MNmwPE1jzWm6lfuPVOCRU=",
+  "Source": "SqlQueryApp",
+  "BasePath": "_content/SqlQueryApp",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
