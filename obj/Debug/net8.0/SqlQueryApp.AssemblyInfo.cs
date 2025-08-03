@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SqlQueryApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4edd8e9d84aa31c6bfb18119eef570527ab9fe74")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f69e5037c1d845865ae567882487a1d24db77b4d")]
 [assembly: System.Reflection.AssemblyProductAttribute("SqlQueryApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SqlQueryApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
