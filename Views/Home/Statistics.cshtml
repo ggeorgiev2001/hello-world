@@ -1,0 +1,198 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-chart-bar me-2"></i>Database Statistics</h1>
+        <p class="text-muted">Overview of your product database</p>
+    </div>
+</div>
+
+@if (Model != null)
+{
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-box fa-3x mb-3"></i>
+                    <h3 class="fw-bold">@Model.TotalProducts</h3>
+                    <p class="mb-0">Total Products</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-dollar-sign fa-3x mb-3"></i>
+                    <h3 class="fw-bold">$@(((decimal)Model.TotalValue).ToString("N2"))</h3>
+                    <p class="mb-0">Total Inventory Value</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-warehouse fa-3x mb-3"></i>
+                    <h3 class="fw-bold">@Model.TotalStock</h3>
+                    <p class="mb-0">Total Stock Items</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-2x mb-3"></i>
+                    <h4 class="fw-bold">$@(((decimal)Model.AveragePrice).ToString("F2"))</h4>
+                    <p class="mb-0">Average Price</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-arrow-down fa-2x mb-3 text-success"></i>
+                    <h4 class="fw-bold">$@(((decimal)Model.MinPrice).ToString("F2"))</h4>
+                    <p class="mb-0">Lowest Price</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-arrow-up fa-2x mb-3"></i>
+                    <h4 class="fw-bold">$@(((decimal)Model.MaxPrice).ToString("F2"))</h4>
+                    <p class="mb-0">Highest Price</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        No statistics available. Please add some products first.
+    </div>
+}
+
+<!-- Additional Query Examples -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-database me-2"></i>Quick Database Queries</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-primary w-100" onclick="loadLowStockProducts()">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Low Stock Products
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-info w-100" onclick="loadExpensiveProducts()">
+                            <i class="fas fa-gem me-2"></i>Premium Products ($500+)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Query Results -->
+<div id="queryResults" class="mt-4" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0" id="queryTitle">Query Results</h5>
+        </div>
+        <div class="card-body">
+            <div id="queryContent"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        async function loadLowStockProducts() {
+            try {
+                const response = await fetch('/api/products/low-stock?threshold=15');
+                const products = await response.json();
+                
+                document.getElementById('queryTitle').innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Low Stock Products (≤15 items)';
+                displayQueryResults(products, 'No low stock products found.');
+            } catch (error) {
+                console.error('Error loading low stock products:', error);
+                alert('Error loading data. Please try again.');
+            }
+        }
+
+        async function loadExpensiveProducts() {
+            try {
+                const response = await fetch('/api/products/search-by-price-range?minPrice=500&maxPrice=99999');
+                const products = await response.json();
+                
+                document.getElementById('queryTitle').innerHTML = '<i class="fas fa-gem me-2"></i>Premium Products ($500+)';
+                displayQueryResults(products, 'No premium products found.');
+            } catch (error) {
+                console.error('Error loading expensive products:', error);
+                alert('Error loading data. Please try again.');
+            }
+        }
+
+        function displayQueryResults(products, emptyMessage) {
+            const container = document.getElementById('queryContent');
+            const resultsDiv = document.getElementById('queryResults');
+            
+            if (products.length > 0) {
+                let html = `
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                products.forEach(product => {
+                    html += `
+                        <tr>
+                            <td><strong>${product.name}</strong></td>
+                            <td><span class="text-success fw-bold">$${product.price.toFixed(2)}</span></td>
+                            <td><span class="badge ${product.stock <= 10 ? 'bg-warning' : 'bg-success'}">${product.stock}</span></td>
+                            <td><span class="badge ${product.isActive ? 'bg-success' : 'bg-secondary'}">${product.isActive ? 'Active' : 'Inactive'}</span></td>
+                            <td>
+                                <a href="/Home/Details/${product.id}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>`;
+                });
+                
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">${emptyMessage}</p>
+                    </div>`;
+            }
+            
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+}
