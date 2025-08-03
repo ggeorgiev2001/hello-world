@@ -8,12 +8,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     // Use SQLite for development on Linux, SQL Server for production
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (connectionString!.Contains("Data Source="))
-    {
+    if (connectionString!.Contains("Data Source=")) {
         options.UseSqlite(connectionString);
-    }
-    else
-    {
+    } else {
         options.UseSqlServer(connectionString);
     }
 });
